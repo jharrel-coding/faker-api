@@ -1,59 +1,47 @@
 const express = require("express");
-import { faker } from '@faker-js/faker';
+const faker = require("faker");
 const app = express();
 const port = 8000;
 
-class User {
-    constructor() {
-        this._id = faker.datatype.uuid();
-        this.firstName = faker.name.firstName();
-        this.lastName = faker.name.lastName();
-        // this.phoneNumber = faker.phone.number();
-        this.email = faker.internet.email();
-        this.password = faker.internet.password();
-    }
-}
-console.log(new User());
+const generateUserObj = () => ({
+    _id: faker.datatype.uuid(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    // phoneNumber: faker.phone.number(),
+    email: faker.internet.email(),
+    passsword: faker.internet.password(),
+});
 
-class Company {
-    constructor(){
-        this._id = faker.datatype.uuid();
-        this.name = faker.company.companyName();
-        this.street = faker.address.streetName();
-        this.city = faker.address.city();
-        this.state = faker.address.state();
-        this.zipCode = faker.address.zipCode();
-        this.country = faker.address.country();
-    }
-}
-console.log(new Company());
+const generateCompanyObject = () => ({
+    _id: faker.datatype.uuid(),
+    name: faker.company.companyName(),
+    address: {
+        street: faker.address.streetAddress(),
+        city: faker.address.cityName(),
+        state: faker.address.state(),
+        zipcode: faker.address.zipCode(),
+        country: faker.address.country(),
+    },
+});
 
-app.get('/api/users/new', (req,res) =>{
-    var user = new User();
-    res.json({
-        results: user
-    });
+app.get("/api/users/new", (req, res) => {
+    const newUser = generateUserObj();
+    res.json(newUser);
+});
 
-})
+app.get("/api/companies/new", (req, res) => {
+    const newCompany = generateCompanyObject();
+    res.json(newCompany);
+});
 
-app.get('/api/companies/new', (req,res) =>{
-    var company = new Company();
-    res.json({
-        results: company
-    });
+app.get("/api/user/company", (req, res) => {
+    const newUser = generateUserObj();
+    const newCompany = generateCompanyObject();
+    const responseObject = {
+        user: newUser,
+        company: newCompany,
+    };
+    res.json(responseObject);
+});
 
-})
-
-app.get('/api/user/company', (req, res) =>{
-    var user = new User();
-    var company = new Company();
-    res.json({
-        results: {
-            user: user,
-            company: company,
-        }
-    })
-})
-
-// this needs to be below the other code blocks
-const server = app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => console.log(`express server running on port ${port}`));
